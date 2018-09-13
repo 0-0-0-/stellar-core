@@ -140,7 +140,8 @@ TransactionFrame::addSignature(DecoratedSignature const& signature)
 
 bool
 TransactionFrame::checkSignature(SignatureChecker& signatureChecker,
-                                 AccountFrame& account, int32_t neededWeight)
+                                 AccountFrame& account, int32_t neededWeight,
+                                 Hash const& opHash)
 {
     std::vector<Signer> signers;
     if (account.getAccount().thresholds[0])
@@ -151,7 +152,7 @@ TransactionFrame::checkSignature(SignatureChecker& signatureChecker,
                    account.getAccount().signers.end());
 
     return signatureChecker.checkSignature(account.getID(), signers,
-                                           neededWeight);
+                                           neededWeight, opHash);
 }
 
 AccountFrame::pointer
@@ -289,7 +290,7 @@ TransactionFrame::commonValid(SignatureChecker& signatureChecker,
     }
 
     if (!checkSignature(signatureChecker, *mSigningAccount,
-                        mSigningAccount->getLowThreshold()))
+                        mSigningAccount->getLowThreshold(), Hash()))
     {
         app.getMetrics()
             .NewMeter({"transaction", "invalid", "bad-auth"}, "transaction")
